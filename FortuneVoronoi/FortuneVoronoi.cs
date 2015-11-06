@@ -564,17 +564,17 @@ namespace FortuneVoronoi
 		}	
 		public static VoronoiGraph ComputeVoronoiGraph(IEnumerable<Vector2> datapoints)
 		{
-			var pq = new BinaryPriorityQueue<VEvent>();
+		    var pq = new HandyCollections.Heap.MinHeap<VEvent>();
 			var currentCircles = new Dictionary<VDataNode, VCircleEvent>();
 			var vg = new VoronoiGraph();
 			VNode rootNode = null;
 			foreach(Vector2 v in datapoints)
 			{
-				pq.Push(new VDataEvent(v));
+				pq.Add(new VDataEvent(v));
 			}
 			while(pq.Count>0)
 			{
-				var ve = pq.Pop() as VEvent;
+				var ve = pq.RemoveMin() as VEvent;
 				VDataNode[] circleCheckList;
 				if(ve is VDataEvent)
 				{
@@ -598,7 +598,7 @@ namespace FortuneVoronoi
 					var vce = VNode.CircleCheckDataNode(vd,ve.Y);
 					if(vce!=null)
 					{
-						pq.Push(vce);
+						pq.Add(vce);
 						currentCircles[vd]=vce;
 					}
 				}
