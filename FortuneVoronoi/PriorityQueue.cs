@@ -1,72 +1,56 @@
-using System;
-using System.Collections;
+using System.Collections.Generic;
 
-namespace BenTools.Data
+namespace FortuneVoronoi
 {
-	public interface IPriorityQueue : ICollection, ICloneable, IList
+	public interface IPriorityQueue<T>
 	{
-		int Push(object O);
-		object Pop();
-		object Peek();
-		void Update(int i);
+		int Push(T o);
+		T Pop();
+		T Peek();
 	}
-	public class BinaryPriorityQueue : IPriorityQueue, ICollection, ICloneable, IList
+	public sealed class BinaryPriorityQueue<T> : IPriorityQueue<T>
 	{
-		protected ArrayList InnerList = new ArrayList();
-		protected IComparer Comparer;
+	    private readonly List<T> _innerList = new List<T>();
+	    private readonly IComparer<T> _comparer;
 
 		#region contructors
-		public BinaryPriorityQueue() : this(System.Collections.Comparer.Default)
-		{}
-		public BinaryPriorityQueue(IComparer c)
+		public BinaryPriorityQueue() : this(Comparer<T>.Default)
 		{
-			Comparer = c;
+        }
+
+		public BinaryPriorityQueue(IComparer<T> c)
+		{
+			_comparer = c;
 		}
-		public BinaryPriorityQueue(int C) : this(System.Collections.Comparer.Default,C)
-		{}
-		public BinaryPriorityQueue(IComparer c, int Capacity)
+	    #endregion
+
+	    private void SwitchElements(int i, int j)
 		{
-			Comparer = c;
-			InnerList.Capacity = Capacity;
+			var h = _innerList[i];
+			_innerList[i] = _innerList[j];
+			_innerList[j] = h;
 		}
 
-		protected BinaryPriorityQueue(ArrayList Core, IComparer Comp, bool Copy)
+	    private int OnCompare(int i, int j)
 		{
-			if(Copy)
-				InnerList = Core.Clone() as ArrayList;
-			else
-				InnerList = Core;
-			Comparer = Comp;
-		}
-
-		#endregion
-		protected void SwitchElements(int i, int j)
-		{
-			object h = InnerList[i];
-			InnerList[i] = InnerList[j];
-			InnerList[j] = h;
-		}
-
-		protected virtual int OnCompare(int i, int j)
-		{
-			return Comparer.Compare(InnerList[i],InnerList[j]);
+			return _comparer.Compare(_innerList[i], _innerList[j]);
 		}
 
 		#region public methods
 		/// <summary>
 		/// Push an object onto the PQ
 		/// </summary>
-		/// <param name="O">The new object</param>
+		/// <param name="o">The new object</param>
 		/// <returns>The index in the list where the object is _now_. This will change when objects are taken from or put onto the PQ.</returns>
-		public int Push(object O)
+		public int Push(T o)
 		{
-			int p = InnerList.Count,p2;
-			InnerList.Add(O); // E[p] = O
+		    int p = _innerList.Count;
+		    _innerList.Add(o); // E[p] = o
 			do
 			{
 				if(p==0)
 					break;
-				p2 = (p-1)/2;
+				var p2 = (p-1)/2;
 				if(OnCompare(p,p2)<0)
 				{
 					SwitchElements(p,p2);
@@ -82,20 +66,20 @@ namespace BenTools.Data
 		/// Get the smallest object and remove it.
 		/// </summary>
 		/// <returns>The smallest object</returns>
-		public object Pop()
+		public T Pop()
 		{
-			object result = InnerList[0];
-			int p = 0,p1,p2,pn;
-			InnerList[0] = InnerList[InnerList.Count-1];
-			InnerList.RemoveAt(InnerList.Count-1);
+			var result = _innerList[0];
+		    var p = 0;
+		    _innerList[0] = _innerList[_innerList.Count-1];
+			_innerList.RemoveAt(_innerList.Count-1);
 			do
 			{
-				pn = p;
-				p1 = 2*p+1;
-				p2 = 2*p+2;
-				if(InnerList.Count>p1 && OnCompare(p,p1)>0) // links kleiner
+				var pn = p;
+				var p1 = 2*p+1;
+				var p2 = 2*p+2;
+				if(_innerList.Count>p1 && OnCompare(p,p1)>0) // links kleiner
 					p = p1;
-				if(InnerList.Count>p2 && OnCompare(p,p2)>0) // rechts noch kleiner
+				if(_innerList.Count>p2 && OnCompare(p,p2)>0) // rechts noch kleiner
 					p = p2;
 				
 				if(p==pn)
@@ -106,169 +90,32 @@ namespace BenTools.Data
 		}
 
 		/// <summary>
-		/// Notify the PQ that the object at position i has changed
-		/// and the PQ needs to restore order.
-		/// Since you dont have access to any indexes (except by using the
-		/// explicit IList.this) you should not call this function without knowing exactly
-		/// what you do.
-		/// </summary>
-		/// <param name="i">The index of the changed object.</param>
-		public void Update(int i)
-		{
-			int p = i,pn;
-			int p1,p2;
-			do	// aufsteigen
-			{
-				if(p==0)
-					break;
-				p2 = (p-1)/2;
-				if(OnCompare(p,p2)<0)
-				{
-					SwitchElements(p,p2);
-					p = p2;
-				}
-				else
-					break;
-			}while(true);
-			if(p<i)
-				return;
-			do	   // absteigen
-			{
-				pn = p;
-				p1 = 2*p+1;
-				p2 = 2*p+2;
-				if(InnerList.Count>p1 && OnCompare(p,p1)>0) // links kleiner
-					p = p1;
-				if(InnerList.Count>p2 && OnCompare(p,p2)>0) // rechts noch kleiner
-					p = p2;
-				
-				if(p==pn)
-					break;
-				SwitchElements(p,pn);
-			}while(true);
-		}
-
-		/// <summary>
 		/// Get the smallest object without removing it.
 		/// </summary>
 		/// <returns>The smallest object</returns>
-		public object Peek()
+		public T Peek()
 		{
-			if(InnerList.Count>0)
-				return InnerList[0];
-			return null;
+			if(_innerList.Count>0)
+				return _innerList[0];
+			return default(T);
 		}
 
-		public bool Contains(object value)
+		public bool Contains(T value)
 		{
-			return InnerList.Contains(value);
+			return _innerList.Contains(value);
 		}
 
 		public void Clear()
 		{
-			InnerList.Clear();
+			_innerList.Clear();
 		}
 
 		public int Count
 		{
 			get
 			{
-				return InnerList.Count;
+				return _innerList.Count;
 			}
-		}
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return InnerList.GetEnumerator();
-		}
-
-		public void CopyTo(Array array, int index)
-		{
-			InnerList.CopyTo(array,index);
-		}
-
-		public object Clone()
-		{
-			return new BinaryPriorityQueue(InnerList,Comparer,true);	
-		}
-
-		public bool IsSynchronized
-		{
-			get
-			{
-				return InnerList.IsSynchronized;
-			}
-		}
-
-		public object SyncRoot
-		{
-			get
-			{
-				return this;
-			}
-		}
-		#endregion
-		#region explicit implementation
-		bool IList.IsReadOnly
-		{
-			get
-			{
-				return false;
-			}
-		}
-
-		object IList.this[int index]
-		{
-			get
-			{
-				return InnerList[index];
-			}
-			set
-			{
-				InnerList[index] = value;
-				Update(index);
-			}
-		}
-
-		int IList.Add(object o)
-		{
-			return Push(o);
-		}
-
-		void IList.RemoveAt(int index)
-		{
-			throw new NotSupportedException();
-		}
-
-		void IList.Insert(int index, object value)
-		{
-			throw new NotSupportedException();
-		}
-
-		void IList.Remove(object value)
-		{
-			throw new NotSupportedException();
-		}
-
-		int IList.IndexOf(object value)
-		{
-			throw new NotSupportedException();
-		}
-
-		bool IList.IsFixedSize
-		{
-			get
-			{
-				return false;
-			}
-		}
-
-		public static BinaryPriorityQueue Syncronized(BinaryPriorityQueue P)
-		{
-			return new BinaryPriorityQueue(ArrayList.Synchronized(P.InnerList),P.Comparer,false);
-		}
-		public static BinaryPriorityQueue ReadOnly(BinaryPriorityQueue P)
-		{
-			return new BinaryPriorityQueue(ArrayList.ReadOnly(P.InnerList),P.Comparer,false);
 		}
 		#endregion
 	}
