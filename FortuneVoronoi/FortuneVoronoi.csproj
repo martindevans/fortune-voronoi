@@ -122,12 +122,11 @@
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Event.cs" />
     <Compile Include="FortuneVoronoi.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="PriorityQueue.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="Node.cs" />
     <Compile Include="ToolBox.cs">
       <SubType>Code</SubType>
     </Compile>

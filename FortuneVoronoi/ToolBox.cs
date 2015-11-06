@@ -18,7 +18,7 @@ namespace FortuneVoronoi
 	        if ((d1.X * d2.X < 0) || (d1.Y * d2.Y < 0))
 	            return -1;
 
-	        if ((d1.X * d1.X + d1.Y * d1.Y) < (d2.X * d2.X + d2.Y * d2.Y) && plusOneOnZeroDegrees)
+	        if (d1.X * d1.X + d1.Y * d1.Y < d2.X * d2.X + d2.Y * d2.Y && plusOneOnZeroDegrees)
 	            return +1;
 
 	        return 0;
