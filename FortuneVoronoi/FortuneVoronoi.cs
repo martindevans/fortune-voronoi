@@ -5,92 +5,6 @@ using HandyCollections.Heap;
 
 namespace FortuneVoronoi
 {
-    public class VoronoiGraph
-    {
-        internal readonly HashSet<Vector2> MutableVertices = new HashSet<Vector2>();
-        public IReadOnlyCollection<Vector2> Vertices
-        {
-            get { return MutableVertices; }
-        }
-
-        internal readonly HashSet<VoronoiEdge> MutableEdges = new HashSet<VoronoiEdge>();
-        public IReadOnlyCollection<VoronoiEdge> Edges
-        {
-            get { return MutableEdges; }
-        }
-    }
-
-    public class VoronoiEdge
-    {
-        internal bool Done;
-        public Vector2 RightData { get; set; }
-        public Vector2 LeftData { get; set; }
-        public Vector2? VVertexA { get; set; }
-        public Vector2? VVertexB { get; set; }
-
-        public void AddVertex(Vector2 v)
-        {
-            if (!VVertexA.HasValue)
-                VVertexA = v;
-            else if (!VVertexB.HasValue)
-                VVertexB = v;
-            else
-                throw new Exception("Tried to add third vertex!");
-        }
-
-        public bool IsInfinite
-        {
-            get { return VVertexA == Fortune.VvInfinite && VVertexB == Fortune.VvInfinite; }
-        }
-
-        public bool IsPartlyInfinite
-        {
-            get { return VVertexA == Fortune.VvInfinite || VVertexB == Fortune.VvInfinite; }
-        }
-
-        public Vector2 FixedPoint
-        {
-            get
-            {
-                if (IsInfinite)
-                    return 0.5f * (LeftData + RightData);
-                if (VVertexA != Fortune.VvInfinite)
-                    return VVertexA.Value;
-                return VVertexB.Value;
-            }
-        }
-
-        public Vector2 DirectionVector
-        {
-            get
-            {
-                if (!IsPartlyInfinite)
-                    return (VVertexB.Value - VVertexA.Value) * (1.0f / (float)Math.Sqrt(Vector2.Distance(VVertexA.Value, VVertexB.Value)));
-                if (LeftData.X == RightData.X)
-                {
-                    if (LeftData.Y < RightData.Y)
-                        return new Vector2(-1, 0);
-                    return new Vector2(1, 0);
-                }
-                var erg = new Vector2(-(RightData.Y - LeftData.Y) / (RightData.X - LeftData.X), 1);
-                if (RightData.X < LeftData.X)
-                    erg *= -1;
-                erg *= 1.0f / erg.Length();
-                return erg;
-            }
-        }
-
-        public double Length
-        {
-            get
-            {
-                if (IsPartlyInfinite)
-                    return double.PositiveInfinity;
-                return Math.Sqrt(Vector2.Distance(VVertexA.Value, VVertexB.Value));
-            }
-        }
-    }
-
     public abstract class Fortune
     {
         internal static readonly Vector2 VvInfinite = new Vector2(float.PositiveInfinity, float.PositiveInfinity);
@@ -165,11 +79,11 @@ namespace FortuneVoronoi
             return new Vector2(tx + alpha * ux, ty + alpha * uy);
         }
 
-        public static VoronoiGraph ComputeVoronoiGraph(IEnumerable<Vector2> points)
+        public static Graph ComputeVoronoiGraph(IEnumerable<Vector2> points)
         {
             var pq = new MinHeap<VEvent>();
             var currentCircles = new Dictionary<VDataNode, VCircleEvent>();
-            var vg = new VoronoiGraph();
+            var vg = new Graph();
             VNode rootNode = null;
             foreach (var v in points)
             {
@@ -235,7 +149,7 @@ namespace FortuneVoronoi
                 }
             }
 
-            var minuteEdges = new List<VoronoiEdge>();
+            var minuteEdges = new List<Edge>();
             foreach (var ve in vg.Edges)
             {
                 if (!ve.IsPartlyInfinite && ve.VVertexA.Equals(ve.VVertexB))

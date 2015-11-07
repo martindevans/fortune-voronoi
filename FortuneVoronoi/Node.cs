@@ -143,7 +143,7 @@ namespace FortuneVoronoi
         /// <summary>
         /// Will return the new root (unchanged except in start-up)
         /// </summary>
-        public static VNode ProcessDataEvent(VDataEvent e, VNode root, VoronoiGraph vg, double ys, out VDataNode[] circleCheckList)
+        public static VNode ProcessDataEvent(VDataEvent e, VNode root, Graph vg, double ys, out VDataNode[] circleCheckList)
         {
             if (root == null)
             {
@@ -154,7 +154,7 @@ namespace FortuneVoronoi
             //1. Find the node to be replaced
             VNode c = FindDataNode(root, ys, e.DataPoint.X);
             //2. Create the subtree (ONE Edge, but two VEdgeNodes)
-            var ve = new VoronoiEdge
+            var ve = new Edge
             {
                 LeftData = ((VDataNode)c).DataPoint,
                 RightData = e.DataPoint,
@@ -205,7 +205,7 @@ namespace FortuneVoronoi
             return root;
         }
 
-        public static VNode ProcessCircleEvent(VCircleEvent e, VNode root, VoronoiGraph vg, out VDataNode[] circleCheckList)
+        public static VNode ProcessCircleEvent(VCircleEvent e, VNode root, Graph vg, out VDataNode[] circleCheckList)
         {
             VEdgeNode eo;
             var b = e.NodeN;
@@ -260,7 +260,7 @@ namespace FortuneVoronoi
 
 
             //2. Replace eo by new Edge
-            var ve = new VoronoiEdge
+            var ve = new Edge
             {
                 LeftData = a.DataPoint,
                 RightData = c.DataPoint
@@ -332,12 +332,12 @@ namespace FortuneVoronoi
 
     internal class VEdgeNode : VNode
     {
-        public VEdgeNode(VoronoiEdge e, bool flipped)
+        public VEdgeNode(Edge e, bool flipped)
         {
             Edge = e;
             Flipped = flipped;
         }
-        public readonly VoronoiEdge Edge;
+        public readonly Edge Edge;
         public readonly bool Flipped;
         public double Cut(double ys, double x)
         {
