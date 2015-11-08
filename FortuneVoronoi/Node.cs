@@ -143,7 +143,7 @@ namespace FortuneVoronoi
         /// <summary>
         /// Will return the new root (unchanged except in start-up)
         /// </summary>
-        public static VNode ProcessDataEvent(VDataEvent e, VNode root, Graph vg, double ys, out VDataNode[] circleCheckList)
+        public static VNode ProcessDataEvent(VDataEvent e, VNode root, VoronoiGraph vg, double ys, out VDataNode[] circleCheckList)
         {
             if (root == null)
             {
@@ -205,7 +205,7 @@ namespace FortuneVoronoi
             return root;
         }
 
-        public static VNode ProcessCircleEvent(VCircleEvent e, VNode root, Graph vg, out VDataNode[] circleCheckList)
+        public static VNode ProcessCircleEvent(VCircleEvent e, VNode root, VoronoiGraph vg, out VDataNode[] circleCheckList)
         {
             VEdgeNode eo;
             var b = e.NodeN;

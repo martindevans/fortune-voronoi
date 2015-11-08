@@ -131,7 +131,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Edge.cs" />
-    <Compile Include="Graph.cs" />
+    <Compile Include="VoronoiGraph.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">

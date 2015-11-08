@@ -5,7 +5,7 @@ using HandyCollections.Heap;
 
 namespace FortuneVoronoi
 {
-    public abstract class Fortune
+    public static class Fortune
     {
         internal static readonly Vector2 VvInfinite = new Vector2(float.PositiveInfinity, float.PositiveInfinity);
 
@@ -79,11 +79,11 @@ namespace FortuneVoronoi
             return new Vector2(tx + alpha * ux, ty + alpha * uy);
         }
 
-        public static Graph ComputeVoronoiGraph(IEnumerable<Vector2> points)
+        public static VoronoiGraph ComputeVoronoiGraph(IEnumerable<Vector2> points)
         {
             var pq = new MinHeap<VEvent>();
             var currentCircles = new Dictionary<VDataNode, VCircleEvent>();
-            var vg = new Graph();
+            var vg = new VoronoiGraph();
             VNode rootNode = null;
             foreach (var v in points)
             {

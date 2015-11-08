@@ -7,8 +7,8 @@ namespace FortuneVoronoi
     {
         internal bool Done;
 
-        public Vector2 RightData { get; set; }
-        public Vector2 LeftData { get; set; }
+        public Vector2 RightData { get; internal set; }
+        public Vector2 LeftData { get; internal set; }
 
         internal Vector2? VVertexA { get; set; }
         internal Vector2? VVertexB { get; set; }
