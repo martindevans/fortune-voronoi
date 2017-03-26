@@ -1,6 +1,6 @@
 # FortuneVoronoi
 
-This is a fork of the [Fortune-Voronoi](code.google.com/p/fortune-voronoi) project exported from google code. This fork exists primarily to clean up and modernize the code:
+This is a fork of the [Fortune-Voronoi](http://code.google.com/p/fortune-voronoi) project exported from google code. This fork exists primarily to clean up and modernize the code:
 
  - Generic collections
  - Immutable classes
